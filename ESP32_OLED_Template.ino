@@ -98,7 +98,6 @@ void reconnect() {
 
 void setup() {
 	Serial.begin(115200);
-	dht.setup(dhtPin);
 	// Setup wifi
 	setup_wifi();
 	client.setServer(MQTT_SERVER_IP, MQTT_SERVER_PORT);
@@ -106,6 +105,7 @@ void setup() {
 	// Initialising the UI will init the display too.
 	display.init();
 	display.setFont(ArialMT_Plain_10);
+	dht.setup(dhtPin);
 }
 
 
