@@ -61,10 +61,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 		Serial.print((char)payload[i]);
 	}
 	Serial.println("");
-	if (strcmp(topic, "ESP32_1/showOutTemp") == 0) {
+	if (strcmp(topic, "WittyCloud/temp") == 0) {
 		char* buffer = (char*)payload;
 		buffer[length] = '\0';
-		outTemperature = String(buffer);
+		float temp = atof(buffer);
+		outTemperature = String(temp, 1);		
 	}
 	if (strcmp(topic, "ESP32_1/showIcon") == 0) {
 		char* buffer = (char*)payload;
@@ -83,7 +84,7 @@ void reconnect() {
 			// Once connected, publish an announcement...
 			client.publish("ESP32_1/status", "ESP32_1 connected");
 			// ... and resubscribe
-			client.subscribe("ESP32_1/showOutTemp");
+			client.subscribe("WittyCloud/temp");
 			client.subscribe("ESP32_1/showIcon");
 		}
 		else {
