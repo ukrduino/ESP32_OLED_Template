@@ -23,6 +23,7 @@ String outTemperature = "0";
 String sensorTemperature = "0";
 String sensorHumidity = "0";
 String iconId = "";
+String windSpeed = "0";
 float h = 0;
 float t = 0;
 unsigned long lastGetSensorData = 0;
@@ -72,6 +73,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 		buffer[length] = '\0';
 		iconId = String(buffer);
 	}
+	if (strcmp(topic, "ESP32_1/showWind") == 0) {
+		char* buffer = (char*)payload;
+		buffer[length] = '\0';
+		windSpeed = String(buffer);
+	}
 }
 
 void reconnect() {
@@ -86,6 +92,7 @@ void reconnect() {
 			// ... and resubscribe
 			client.subscribe("WittyCloud/temp");
 			client.subscribe("ESP32_1/showIcon");
+			client.subscribe("ESP32_1/showWind");
 		}
 		else {
 			Serial.print("failed, rc=");
@@ -183,8 +190,13 @@ void processDisplay() {
 			break;
 		case 3:
 			Serial.print(iconId);
-			nextScreen = 0;
+			nextScreen = 4;
 			showIcon();
+			break;
+		case 4:
+			Serial.print(windSpeed);
+			nextScreen = 0;
+			showWind();
 			break;
 		default:
 			// statements
@@ -225,6 +237,16 @@ void showInHumidity() {
 	display.display();
 }
 
+void showWind() {
+	display.clear();
+	display.drawXbm(0, 13, wind_width, wind_height, wind_bits);
+	display.setTextAlignment(TEXT_ALIGN_LEFT);
+	display.setFont(Monospaced_plain_32);
+	display.drawString(35, 10, windSpeed + "m/s");
+	// write the buffer to the display
+	display.display();
+}
+
 void showIcon() {
 	display.clear();
 	if (iconId == "01")
@@ -258,6 +280,10 @@ void showIcon() {
 	if (iconId == "13")
 	{
 		display.drawXbm(30, 0, icon_height, icon_height, icon_13);
+	}
+	if (iconId == "50")
+	{
+		display.drawXbm(30, 0, icon_height, icon_height, icon_50);
 	}
 	// write the buffer to the display
 	display.display();
